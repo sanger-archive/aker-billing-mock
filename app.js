@@ -42,7 +42,11 @@ function verifyAccountCode(accountCode) {
 }
 
 // Main app
+var helmet = require('helmet')
+
 app.use(bodyParser.json())
+app.use(helmet())
+
 app.get('/', (req, res) => {
   res.send('Hello world here now\n')
 })
