@@ -12,6 +12,9 @@ A mock service between Aker and Agresso. Written in JavaScript using [express](h
 # Todo
 * Add custom port and host to start app (might not be required)
 
+# Helpful docs
+* https://expressjs.com/en/guide/routing.html
+
 # Misc.
 ## Node packages used
 * [nodemon](https://github.com/remy/nodemon/) - `npm install --global nodemon`

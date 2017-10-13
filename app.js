@@ -56,8 +56,7 @@ app.get('/products/:product/verify', (req, res) => {
 // Verify account code
 app.get('/accounts/:accountCode/verify', (req, res) => {
   let accountCode = req.params.accountCode
-  let verified = accountCode.length > 10 ? true : false
-  res.status(200).json({ accountCode: accountCode, verified: verified })
+  res.status(200).json({ accountCode: accountCode, verified: verifyAccountCode(accountCode) })
 })
 
 // Get unit price from product and account code
@@ -76,7 +75,6 @@ app.get('/products/:product/accounts/:accountCode/unit_price', (req, res) => {
 // Verify the catalog of products
 app.post('/catalog/verify', (req, res) => {
   let catalog = req.body.products
-  console.log(catalog)
   let catalogToReturn = {}
   let catalogVerified = true
   catalog.map((item) => {
