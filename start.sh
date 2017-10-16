@@ -12,7 +12,7 @@ then
   exit 1
 fi
 
-nohup node $PROJECT_FOLDER/current/app.js -c $PROJECT_FOLDER/shared/nginx-selfsigned.pem -k $PROJECT_FOLDER/shared/nginx-selfsigned.key -p $PORT > $PROJECT_FOLDER/current/log.txt 2>&1 &
+nohup node $PROJECT_FOLDER/current/app.js -c $PROJECT_FOLDER/shared/nginx-selfsigned.crt -k $PROJECT_FOLDER/shared/nginx-selfsigned.key -p $PORT > $PROJECT_FOLDER/current/log.txt 2>&1 &
 
 echo $! > ./run.pid
 echo "OK"
