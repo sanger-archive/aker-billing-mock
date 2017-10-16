@@ -1,14 +1,21 @@
 'use strict'
 
+const fs = require('fs');
+
+const http = require('http');
+const https = require('https');
+
 const express = require('express')
 const { Console } = require('console')
 const bodyParser = require('body-parser')
 
 const console = new Console(process.stdout, process.stderr)
 
+var argv = require('minimist')(process.argv.slice(2));
+
 // Constants
-const PORT = 8080
-const HOST = '0.0.0.0'
+const PORT = argv['p'] || 8080 ;
+const HOST = argv['h'] || '0.0.0.0';
 
 // App
 const app = express()
@@ -42,7 +49,11 @@ function verifyAccountCode(accountCode) {
 }
 
 // Main app
+var helmet = require('helmet')
+
 app.use(bodyParser.json())
+app.use(helmet())
+
 app.get('/', (req, res) => {
   res.send('Hello world here now\n')
 })
@@ -95,6 +106,20 @@ app.post('/catalog/verify', (req, res) => {
 
 })
 
+var server;
 
-app.listen(PORT, HOST)
+const SSL= (argv['k'] || argv['c']);
+
+if (SSL) {
+  const privateKey  = fs.readFileSync(argv['k'], 'utf8');
+  const certificate = fs.readFileSync(argv['c'], 'utf8');
+  const credentials = {key: privateKey, cert: certificate};
+  
+  server = https.createServer(credentials, app)
+} else {
+  server = http.createServer(app)
+}
+
+server.listen(PORT, HOST)
+
 console.log(`Running on http://${HOST}:${PORT}`)
