@@ -1,6 +1,16 @@
 # Aker - billing facade mock
 A mock service between Aker and Agresso. Written in JavaScript using [express](https://expressjs.com/).
 
+Usage:
+
+To start a HTTP server in a specific network address and port:
+
+node app.js -h <host> -p <port>
+
+To start a HTTPS server, we need to provide the paths to the private key and certificate:
+
+node app.js -k <keyfile> -c <certificate> -h <host> -p <port>
+
 # Getting up and running
 * Clone the repo
 * Confirm that you have node and npm installed
