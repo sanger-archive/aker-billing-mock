@@ -14,7 +14,7 @@ const console = new Console(process.stdout, process.stderr)
 var argv = require('minimist')(process.argv.slice(2));
 
 // Constants
-const PORT = argv['p'] || 8080 ;
+const PORT = argv['p'] || 3601 ;
 const HOST = argv['h'] || '0.0.0.0';
 
 // App
@@ -27,7 +27,7 @@ const app = express()
  * @return {string} - The unit price
  */
 function determineUnitPrice(product, accountCode) {
-  return product.length + accountCode.length
+  return (product.length + accountCode.length).toString()
 }
 
 /**
@@ -45,7 +45,7 @@ function verifyProductName(productName) {
  * @return {boolean} - Whether the account code is verified or not
  */
 function verifyAccountCode(accountCode) {
-  return accountCode.length > 10 ? true : false
+  return accountCode[0]=='S' ? true : false
 }
 
 // Main app
@@ -58,53 +58,65 @@ app.get('/', (req, res) => {
   res.send('Hello world here now\n')
 })
 
-// Verify product name
-app.get('/products/:product/verify', (req, res) => {
-  let product = req.params.product
-  res.status(200).json({ productName: product, verified: verifyProductName(product) })
-})
-
-// Verify account code
-app.get('/accounts/:accountCode/verify', (req, res) => {
-  let accountCode = req.params.accountCode
-  res.status(200).json({ accountCode: accountCode, verified: verifyAccountCode(accountCode) })
-})
 
 // Get unit price from product and account code
-app.get('/products/:product/accounts/:accountCode/unit_price', (req, res) => {
-  let product = req.params.product
-  let accountCode = req.params.accountCode
-  let verified = verifyProductName(product) && verifyAccountCode(accountCode) ? true : false
-  let unitPrice = verified ? determineUnitPrice(product, accountCode) : 0
-  if (verified) {
-    res.status(200).json({ accountCode: accountCode, productName: product, unitPrice: unitPrice, verified: verified })
-  } else {
-    res.status(200).json({ accountCode: accountCode, productName: product, verified: verified })
-  }
+app.post('/accounts/:accountCode/unit_price', (req, res) => {
+  let products = req.body
+  res.status(200).json(products.map((product) => {
+    let accountCode = req.params.accountCode
+    let verified = verifyProductName(product) && verifyAccountCode(accountCode)
+    let unitPrice = verified ? determineUnitPrice(product, accountCode) : 0
+    if (verified) {
+      return ({ accountCode: accountCode, productName: product, unitPrice: unitPrice, verified: verified })
+    } else {
+      return({ accountCode: accountCode, productName: product, verified: verified })
+    }
+  }))
 })
+
+const actionHandlerSingleVerify = (field, verifiedField, verifyMethod) => {
+  return (req, res) => {
+    let product = req.params[field]
+    let json = {}
+    json[verifiedField] = product
+    json['verified'] = verifyMethod(product)
+    res.status(200).json(json)
+  }
+}
+
+const actionHandlerMultipleVerify = (field, singleVerify) => {
+  return (req, res) => {
+    let catalog = req.body[field]
+    let catalogToReturn = {}
+    let catalogVerified = true
+    catalog.map((item) => {
+      let verifiedProductName = singleVerify(item)
+      if (!verifiedProductName) {
+        catalogVerified = false
+      }
+      catalogToReturn[item] = verifiedProductName
+
+      return true
+    })
+    if (catalogVerified) {
+      res.status(200).json(catalogToReturn)
+    } else {
+      res.status(400).json(catalogToReturn)
+    }
+  }
+}
+
+// Verify product name
+app.get('/products/:product/verify', actionHandlerSingleVerify('product', 'productName', verifyProductName))
+
+// Verify account code
+app.get('/accounts/:accountCode/verify', actionHandlerSingleVerify('accountCode', 'accountCode', verifyAccountCode))
 
 // Verify the catalog of products
-app.post('/catalog/verify', (req, res) => {
-  let catalog = req.body.products
-  let catalogToReturn = {}
-  let catalogVerified = true
-  catalog.map((item) => {
-    let verifiedProductName = verifyProductName(item)
-    if (!verifiedProductName) {
-      catalogVerified = false
-    }
-    catalogToReturn[item] = verifiedProductName
+app.post('/catalogue/verify', actionHandlerMultipleVerify('products', verifyProductName))
 
-    return true
-  })
-
-  if (catalogVerified) {
-    res.status(200).json(catalogToReturn)
-  } else {
-    res.status(400).json(catalogToReturn)
-  }
-
-})
+// Verify a list of cost codes
+app.post('/accounts/verify', actionHandlerMultipleVerify('accounts', verifyAccountCode))
 
 var server;
 
