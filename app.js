@@ -106,6 +106,7 @@ const actionHandlerMultipleVerify = (field, singleVerify) => {
   }
 }
 
+
 // Verify product name
 app.get('/products/:product/verify', actionHandlerSingleVerify('product', 'productName', verifyProductName))
 
@@ -117,6 +118,14 @@ app.post('/catalogue/verify', actionHandlerMultipleVerify('products', verifyProd
 
 // Verify a list of cost codes
 app.post('/accounts/verify', actionHandlerMultipleVerify('accounts', verifyAccountCode))
+
+// Receive events
+app.post('/events', (req, res) => {
+  let eventName = req.body.eventName;
+  let workOrderId = req.body.workOrderId;
+  console.log('Received event <'+eventName+'> for work order '+workOrderId);
+  res.status(200).end();;
+});
 
 var server;
 
