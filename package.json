@@ -19,6 +19,8 @@
   "homepage": "https://github.com/pjvv/aker-billing-facade-mock#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "helmet": "^3.8.2",
+    "minimist": "^1.2.0"
   }
 }
