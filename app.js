@@ -36,7 +36,7 @@ function determineUnitPrice(product, accountCode) {
  * @return {boolean} - Whether the product name is verified or not
  */
 function verifyProductName(productName) {
-  return productName.length > 10 ? true : false
+  return !productName.toLowerCase().startsWith('x')
 }
 
 /**
@@ -45,7 +45,7 @@ function verifyProductName(productName) {
  * @return {boolean} - Whether the account code is verified or not
  */
 function verifyAccountCode(accountCode) {
-  return accountCode[0]=='S' ? true : false
+  return (accountCode[0]=='S')
 }
 
 // Main app
