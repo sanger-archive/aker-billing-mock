@@ -108,6 +108,17 @@ app.get('/costcode/:costCode/verify', (req, res) => {
   res.status(200).json({ verified: costCodePattern.test(costCode.trim()) })
 })
 
+// Get a list of sub- cost codes for a cost code
+app.get('/costcode/:costCode/subcostcodes', (req, res) => {
+  const { costCode } = req.params
+  const numOfSubs = Math.ceil(Math.random() * 10)
+  const subCostCodes = []
+  for (let i = 0; i < numOfSubs; i += 1) {
+    subCostCodes.push(`${costCode}/${i}`)
+  }
+  res.status(200).json({ subCostCodes })
+})
+
 
 app.listen(PORT, HOST)
 console.log(`Running on http://${HOST}:${PORT}`)
