@@ -1,5 +1,3 @@
-'use strict'
-
 const express = require('express')
 const { Console } = require('console')
 const bodyParser = require('body-parser')
@@ -9,7 +7,6 @@ const console = new Console(process.stdout, process.stderr)
 // Constants
 const PORT = 8080
 const HOST = '0.0.0.0'
-
 // App
 const app = express()
 
@@ -29,7 +26,7 @@ function determineUnitPrice(product, accountCode) {
  * @return {boolean} - Whether the product name is verified or not
  */
 function verifyProductName(productName) {
-  return productName.length > 10 ? true : false
+  return productName.length > 10
 }
 
 /**
@@ -38,47 +35,56 @@ function verifyProductName(productName) {
  * @return {boolean} - Whether the account code is verified or not
  */
 function verifyAccountCode(accountCode) {
-  return accountCode.length > 10 ? true : false
+  return accountCode.length > 10
 }
 
 // Main app
 app.use(bodyParser.json())
 app.get('/', (req, res) => {
-  res.send('Hello world here now\n')
+  res.send('Aker - Billing façade mock\n')
 })
 
 // Verify product name
 app.get('/products/:product/verify', (req, res) => {
-  let product = req.params.product
+  const { product } = req.params
   res.status(200).json({ productName: product, verified: verifyProductName(product) })
 })
 
 // Verify account code
 app.get('/accounts/:accountCode/verify', (req, res) => {
-  let accountCode = req.params.accountCode
-  res.status(200).json({ accountCode: accountCode, verified: verifyAccountCode(accountCode) })
+  const { accountCode } = req.params
+  res.status(200).json({ accountCode, verified: verifyAccountCode(accountCode) })
 })
 
 // Get unit price from product and account code
 app.get('/products/:product/accounts/:accountCode/unit_price', (req, res) => {
-  let product = req.params.product
-  let accountCode = req.params.accountCode
-  let verified = verifyProductName(product) && verifyAccountCode(accountCode) ? true : false
-  let unitPrice = verified ? determineUnitPrice(product, accountCode) : 0
+  const { product } = req.params
+  const { accountCode } = req.params
+  const verified = verifyProductName(product) && verifyAccountCode(accountCode)
+  const unitPrice = verified ? determineUnitPrice(product, accountCode) : 0
   if (verified) {
-    res.status(200).json({ accountCode: accountCode, productName: product, unitPrice: unitPrice, verified: verified })
+    res.status(200).json({
+      accountCode,
+      productName: product,
+      unitPrice,
+      verified,
+    })
   } else {
-    res.status(200).json({ accountCode: accountCode, productName: product, verified: verified })
+    res.status(200).json({
+      accountCode,
+      productName: product,
+      verified,
+    })
   }
 })
 
 // Verify the catalog of products
 app.post('/catalog/verify', (req, res) => {
-  let catalog = req.body.products
-  let catalogToReturn = {}
+  const catalog = req.body.products
+  const catalogToReturn = {}
   let catalogVerified = true
   catalog.map((item) => {
-    let verifiedProductName = verifyProductName(item)
+    const verifiedProductName = verifyProductName(item)
     if (!verifiedProductName) {
       catalogVerified = false
     }
@@ -92,7 +98,6 @@ app.post('/catalog/verify', (req, res) => {
   } else {
     res.status(400).json(catalogToReturn)
   }
-
 })
 
 

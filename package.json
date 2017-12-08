@@ -9,16 +9,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pjvv/aker-billing-facade-mock.git"
+    "url": "git+https://github.com/sanger/aker-billing-facade-mock.git"
   },
-  "author": "",
+  "author": "PSG",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/pjvv/aker-billing-facade-mock/issues"
+    "url": "https://github.com/sanger/aker-billing-facade-mock/issues"
   },
-  "homepage": "https://github.com/pjvv/aker-billing-facade-mock#readme",
+  "homepage": "https://github.com/sanger/aker-billing-facade-mock#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.2"
+  },
+  "devDependencies": {
+    "eslint": "^4.12.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
   }
 }
