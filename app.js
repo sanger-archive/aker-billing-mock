@@ -100,6 +100,14 @@ app.post('/catalog/verify', (req, res) => {
   }
 })
 
+// Verify cost code
+app.get('/costcode/:costCode/verify', (req, res) => {
+  const { costCode } = req.params
+  const costCodePattern = /^s\d{4}$/i
+
+  res.status(200).json({ verified: costCodePattern.test(costCode.trim()) })
+})
+
 
 app.listen(PORT, HOST)
 console.log(`Running on http://${HOST}:${PORT}`)
