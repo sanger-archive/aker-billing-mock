@@ -41,11 +41,21 @@ function verifyProductName(productName) {
 /**
  * Verifies an account code
  * @param {string} accountCode - The account code to verify
- * @return {boolean} - Whether the cost code is verified or not
+ * @return {boolean} - Whether the account code is verified or not
  */
 function verifyAccountCode(accountCode) {
   const accountCodePattern = /^s\d{4}$/i
   return (accountCodePattern.test(accountCode.trim()))
+}
+
+/**
+ * Verifies a sub- cost code (account code)
+ * @param {string} subAccountCode - The sub- account code to verify
+ * @return {boolean} - Whether the account code is verified or not
+ */
+function verifySubAccountCode(subAccountCode) {
+  const subAccountCodePattern = /^s\d{4}-[02468]$/i
+  return (subAccountCodePattern.test(subAccountCode.trim()))
 }
 
 // Main app
@@ -122,6 +132,12 @@ app.get(
   actionHandlerSingleVerify('accountCode', 'accountCode', verifyAccountCode),
 )
 
+// Verify sub- cost code (account code)
+app.get(
+  '/subaccountcodes/:subAccountCode/verify',
+  actionHandlerSingleVerify('subAccountCode', 'subAccountCode', verifySubAccountCode),
+)
+
 // Verify the catalog of products
 app.post('/catalogue/verify', actionHandlerMultipleVerify('products', verifyProductName))
 
@@ -144,7 +160,7 @@ app.get('/accounts/:accountCode/subaccountcodes', (req, res) => {
   const numOfSubs = Math.ceil(Math.random() * 10)
   const subCostCodes = []
   for (let i = 0; i < numOfSubs; i += 1) {
-    subCostCodes.push(`${accountCode}/${i}`)
+    subCostCodes.push(`${accountCode}-${i}`)
   }
   res.status(200).json({ subCostCodes })
 })
