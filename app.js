@@ -1,21 +1,20 @@
-'use strict'
-
-const fs = require('fs');
-
-const http = require('http');
-const https = require('https');
-
-const express = require('express')
-const { Console } = require('console')
 const bodyParser = require('body-parser')
+const { Console } = require('console')
+const express = require('express')
+const fs = require('fs')
+const helmet = require('helmet')
+const http = require('http')
+const https = require('https')
 
 const console = new Console(process.stdout, process.stderr)
 
-var argv = require('minimist')(process.argv.slice(2));
+const argv = require('minimist')(process.argv.slice(2))
 
 // Constants
-const PORT = argv['p'] || 3601 ;
-const HOST = argv['h'] || '0.0.0.0';
+const PORT = argv.p || 3601
+const HOST = argv.h || '0.0.0.0'
+const SSL = (argv.k || argv.c)
+let server
 
 // App
 const app = express()
@@ -40,57 +39,71 @@ function verifyProductName(productName) {
 }
 
 /**
- * Verifies a account code
+ * Verifies an account code
  * @param {string} accountCode - The account code to verify
  * @return {boolean} - Whether the account code is verified or not
  */
 function verifyAccountCode(accountCode) {
-  return (accountCode[0]=='S')
+  const accountCodePattern = /^s\d{4}$/i
+  return (accountCodePattern.test(accountCode.trim()))
+}
+
+/**
+ * Verifies a sub- cost code (account code)
+ * @param {string} subAccountCode - The sub- account code to verify
+ * @return {boolean} - Whether the account code is verified or not
+ */
+function verifySubAccountCode(subAccountCode) {
+  const subAccountCodePattern = /^s\d{4}-[02468]$/i
+  return (subAccountCodePattern.test(subAccountCode.trim()))
 }
 
 // Main app
-var helmet = require('helmet')
-
 app.use(bodyParser.json())
+// Help secure Express apps with various HTTP headers
 app.use(helmet())
 
 app.get('/', (req, res) => {
-  res.send('Hello world here now\n')
+  res.send('Aker - Billing façade mock\n')
 })
-
 
 // Get unit price from product and account code
 app.post('/accounts/:accountCode/unit_price', (req, res) => {
-  let products = req.body
+  console.log(req.body)
+  const products = req.body
+
   res.status(200).json(products.map((product) => {
-    let accountCode = req.params.accountCode
-    let verified = verifyProductName(product) && verifyAccountCode(accountCode)
-    let unitPrice = verified ? determineUnitPrice(product, accountCode) : 0
+    const { accountCode } = req.params
+    const verified = verifyProductName(product) && verifyAccountCode(accountCode)
+    const unitPrice = verified ? determineUnitPrice(product, accountCode) : 0
+
     if (verified) {
-      return ({ accountCode: accountCode, productName: product, unitPrice: unitPrice, verified: verified })
-    } else {
-      return({ accountCode: accountCode, productName: product, verified: verified })
+      return {
+        accountCode, productName: product, unitPrice, verified,
+      }
     }
+
+    return { accountCode, productName: product, verified }
   }))
 })
 
 const actionHandlerSingleVerify = (field, verifiedField, verifyMethod) => {
   return (req, res) => {
-    let product = req.params[field]
-    let json = {}
-    json[verifiedField] = product
-    json['verified'] = verifyMethod(product)
+    const fieldToVerify = req.params[field]
+    const json = {}
+    json[verifiedField] = fieldToVerify
+    json.verified = verifyMethod(fieldToVerify)
     res.status(200).json(json)
   }
 }
 
 const actionHandlerMultipleVerify = (field, singleVerify) => {
   return (req, res) => {
-    let catalog = req.body[field]
-    let catalogToReturn = {}
+    const catalog = req.body[field]
+    const catalogToReturn = {}
     let catalogVerified = true
     catalog.map((item) => {
-      let verifiedProductName = singleVerify(item)
+      const verifiedProductName = singleVerify(item)
       if (!verifiedProductName) {
         catalogVerified = false
       }
@@ -108,10 +121,22 @@ const actionHandlerMultipleVerify = (field, singleVerify) => {
 
 
 // Verify product name
-app.get('/products/:product/verify', actionHandlerSingleVerify('product', 'productName', verifyProductName))
+app.get(
+  '/products/:product/verify',
+  actionHandlerSingleVerify('product', 'productName', verifyProductName),
+)
 
 // Verify account code
-app.get('/accounts/:accountCode/verify', actionHandlerSingleVerify('accountCode', 'accountCode', verifyAccountCode))
+app.get(
+  '/accounts/:accountCode/verify',
+  actionHandlerSingleVerify('accountCode', 'accountCode', verifyAccountCode),
+)
+
+// Verify sub- cost code (account code)
+app.get(
+  '/subaccountcodes/:subAccountCode/verify',
+  actionHandlerSingleVerify('subAccountCode', 'subAccountCode', verifySubAccountCode),
+)
 
 // Verify the catalog of products
 app.post('/catalogue/verify', actionHandlerMultipleVerify('products', verifyProductName))
@@ -121,21 +146,30 @@ app.post('/accounts/verify', actionHandlerMultipleVerify('accounts', verifyAccou
 
 // Receive events
 app.post('/events', (req, res) => {
-  let eventName = req.body.eventName;
-  let workOrderId = req.body.workOrderId;
-  console.log('Received event <'+eventName+'> for work order '+workOrderId);
-  res.status(200).end();;
-});
+  const { eventName } = req.body
+  const { workOrderId } = req.body
 
-var server;
+  console.log(`Received event <${eventName}> for work order ${workOrderId}`)
 
-const SSL= (argv['k'] || argv['c']);
+  res.status(200).end()
+})
+
+// Get a list of sub- cost codes (account codes) for a cost code (account code)
+app.get('/accounts/:accountCode/subaccountcodes', (req, res) => {
+  const { accountCode } = req.params
+  const numOfSubs = Math.ceil(Math.random() * 10)
+  const subCostCodes = []
+  for (let i = 0; i < numOfSubs; i += 1) {
+    subCostCodes.push(`${accountCode}-${i}`)
+  }
+  res.status(200).json({ subCostCodes })
+})
 
 if (SSL) {
-  const privateKey  = fs.readFileSync(argv['k'], 'utf8');
-  const certificate = fs.readFileSync(argv['c'], 'utf8');
-  const credentials = {key: privateKey, cert: certificate};
-  
+  const privateKey = fs.readFileSync(argv.k, 'utf8')
+  const certificate = fs.readFileSync(argv.c, 'utf8')
+  const credentials = { key: privateKey, cert: certificate }
+
   server = https.createServer(credentials, app)
 } else {
   server = http.createServer(app)
@@ -143,4 +177,4 @@ if (SSL) {
 
 server.listen(PORT, HOST)
 
-console.log(`Running on http://${HOST}:${PORT}`)
+console.log(`Running on ${SSL ? 'https' : 'http'}://${HOST}:${PORT}`)

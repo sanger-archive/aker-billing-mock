@@ -6,7 +6,7 @@ FROM node:8
 # https://docs.docker.com/engine/reference/builder/#workdir
 WORKDIR /code
 
-# use nodemon for development
+# Use nodemon for development
 RUN npm install --global nodemon
 
 # Add the package.json file
