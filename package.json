@@ -9,18 +9,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pjvv/aker-billing-facade-mock.git"
+    "url": "git+https://github.com/sanger/aker-billing-facade-mock.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/pjvv/aker-billing-facade-mock/issues"
+    "url": "https://github.com/sanger/aker-billing-facade-mock/issues"
   },
-  "homepage": "https://github.com/pjvv/aker-billing-facade-mock#readme",
+  "homepage": "https://github.com/sanger/aker-billing-facade-mock#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
-    "helmet": "^3.8.2",
+    "helmet": "^3.9.0",
     "minimist": "^1.2.0"
   }
 }
