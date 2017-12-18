@@ -54,7 +54,7 @@ function verifyAccountCode(accountCode) {
  * @return {boolean} - Whether the account code is verified or not
  */
 function verifySubAccountCode(subAccountCode) {
-  const subAccountCodePattern = /^s\d{4}_(\d)?[02468]$/i
+  const subAccountCodePattern = /^s\d{4}-(\d)?[02468]$/i
   return (subAccountCodePattern.test(subAccountCode.trim()))
 }
 
