@@ -67,14 +67,14 @@ app.get('/', (req, res) => {
   res.send('Aker - Billing façade mock\n')
 })
 
-// Get unit price from product and account code
+// Get unit price from product and subproject account code
 app.post('/accounts/:accountCode/unit_price', (req, res) => {
   console.log(req.body)
   const products = req.body
 
   res.status(200).json(products.map((product) => {
     const { accountCode } = req.params
-    const verified = verifyProductName(product) && verifyAccountCode(accountCode)
+    const verified = verifyProductName(product) && verifySubAccountCode(accountCode)
     const unitPrice = verified ? determineUnitPrice(product, accountCode) : 0
 
     if (verified) {
