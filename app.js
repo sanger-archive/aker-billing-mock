@@ -123,19 +123,19 @@ const actionHandlerMultipleVerify = (field, singleVerify) => {
 // Verify product name
 app.get(
   '/products/:product/verify',
-  actionHandlerSingleVerify('product', 'productName', verifyProductName),
+  actionHandlerSingleVerify('product', 'productName', verifyProductName)
 )
 
 // Verify account code
 app.get(
   '/accounts/:accountCode/verify',
-  actionHandlerSingleVerify('accountCode', 'accountCode', verifyAccountCode),
+  actionHandlerSingleVerify('accountCode', 'accountCode', verifyAccountCode)
 )
 
 // Verify sub- cost code (account code)
 app.get(
   '/subaccountcodes/:subAccountCode/verify',
-  actionHandlerSingleVerify('subAccountCode', 'subAccountCode', verifySubAccountCode),
+  actionHandlerSingleVerify('subAccountCode', 'subAccountCode', verifySubAccountCode)
 )
 
 // Verify the catalog of products
