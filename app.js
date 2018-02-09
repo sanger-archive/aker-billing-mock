@@ -30,12 +30,13 @@ function determineUnitPrice(product, accountCode) {
 }
 
 /**
- * Verifies a product name
- * @param {string} productName - The product name to verify
+ * Verifies a process module - currently only IDs starting with an even number are valid
+ * @param {int} moduleId - The module ID to verify
  * @return {boolean} - Whether the product name is verified or not
  */
-function verifyProductName(productName) {
-  return !productName.toLowerCase().startsWith('x')
+function verifyModuleId(moduleId) {
+  const moduleIdPattern = /^[02468]{1}\d*$/
+  return (moduleIdPattern.test(moduleId.trim()))
 }
 
 /**
@@ -120,10 +121,10 @@ const actionHandlerMultipleVerify = (field, singleVerify) => {
 }
 
 
-// Verify product name
+// Verify module ID
 app.get(
-  '/products/:product/verify',
-  actionHandlerSingleVerify('product', 'productName', verifyProductName)
+  '/modules/:module/verify',
+  actionHandlerSingleVerify('module', 'moduleId', verifyModuleId)
 )
 
 // Verify account code
@@ -138,8 +139,8 @@ app.get(
   actionHandlerSingleVerify('subAccountCode', 'subAccountCode', verifySubAccountCode)
 )
 
-// Verify the catalog of products
-app.post('/catalogue/verify', actionHandlerMultipleVerify('products', verifyProductName))
+// Verify a list of modules
+app.post('/modules/verify', actionHandlerMultipleVerify('modules', verifyModuleId))
 
 // Verify a list of cost codes
 app.post('/accounts/verify', actionHandlerMultipleVerify('accounts', verifyAccountCode))

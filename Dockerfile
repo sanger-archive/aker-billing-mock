@@ -19,7 +19,5 @@ RUN npm install
 # Add all remaining contents to the image
 ADD . /code
 
-EXPOSE 8080
-
 #CMD [ "npm", "start" ]
 CMD ["nodemon", "/code/app.js"]
