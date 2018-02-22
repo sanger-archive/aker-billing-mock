@@ -50,6 +50,15 @@ function verifyModuleName(moduleName) {
 }
 
 /**
+ * Verifies a product name
+ * @param {string} productName - The product name to verify
+ * @return {boolean} - Whether the product name is verified or not
+ */
+function verifyProductName(productName) {
+  return !productName.toLowerCase().startsWith('x')
+}
+
+/**
  * Verifies an account code
  * @param {string} accountCode - The account code to verify
  * @return {boolean} - Whether the account code is verified or not
@@ -153,6 +162,12 @@ app.get(
 app.get(
   '/subaccountcodes/:subAccountCode/verify',
   actionHandlerSingleVerify('subAccountCode', 'subAccountCode', verifySubAccountCode)
+)
+
+// Verify product name
+app.get(
+  '/products/:product/verify',
+  actionHandlerSingleVerify('product', 'productName', verifyProductName)
 )
 
 // Verify a list of modules
