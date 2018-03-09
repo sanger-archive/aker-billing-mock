@@ -29,6 +29,11 @@ function determineUnitPrice(product, accountCode) {
   return (product.length + accountCode.length).toString()
 }
 
+function determineModulePrice(module, accountCode) {
+  return (module.length + accountCode.length).toString()
+}
+
+
 /**
  * Verifies a process module - currently only IDs starting with an even number are valid
  * @param {int} moduleId - The module ID to verify
@@ -139,6 +144,31 @@ const actionHandlerMultipleVerify = (field, singleVerify) => {
   }
 }
 
+const get_price_for_module = () => {
+  return (req, res) => {
+    const module = req.body['module']
+    const cost_code = req.body['cost_code']
+    const product = req.body['product']
+
+    let errors = []
+    if (!verifyModuleName(module)) {
+      errors.push('Module name not valid')
+    }
+    if (!verifyProductName(product)) {
+      errors.push('Product name not valid') 
+    }
+    if (!((verifySubAccountCode(cost_code) || verifyAccountCode(cost_code)))) {
+      errors.push('Project not valid') 
+    }
+
+    if (errors.length === 0) {
+      res.status(200).json({ product, module, cost_code, price: determineModulePrice(module, cost_code) })
+    } else {
+      res.status(400).json({ errors })
+    }
+  }
+}
+
 
 // Verify module ID
 app.get(
@@ -176,6 +206,9 @@ app.post('/modules/verify', actionHandlerMultipleVerify('modules', verifyModuleI
 // Verify a list of cost codes
 app.post('/accounts/verify', actionHandlerMultipleVerify('accounts', verifyAccountCode))
 
+// Returns a price for a product and module with a cost code
+app.post('/price_for_module', get_price_for_module())
+
 // Receive events
 app.post('/events', (req, res) => {
   const { eventName } = req.body
@@ -210,3 +243,5 @@ if (SSL) {
 server.listen(PORT, HOST)
 
 console.log(`Running on ${SSL ? 'https' : 'http'}://${HOST}:${PORT}`)
+
+module.exports = server;
