@@ -24,9 +24,9 @@ describe('Billing Facade Mock', function () {
       it('returns a price for the module', function(done) {
         request(server)
           .post('/price_for_module')
-          .send({module: '1234', cost_code: 'S4567', product: 'Product'})
+          .send({module: '1234', cost_code: 'S4567'})
           .expect(200, {
-            module: '1234', cost_code: 'S4567', product: 'Product', price: '9'
+            module: '1234', cost_code: 'S4567', price: '9'
           }, done)
       })            
     })
@@ -34,7 +34,7 @@ describe('Billing Facade Mock', function () {
       it('returns bad request error', function(done) {
         request(server)
           .post('/price_for_module')
-          .send({module: 'x1234', cost_code: 'S4567', product: 'Product'})
+          .send({module: 'x1234', cost_code: 'S4567'})
           .expect(400, done)
       })      
     })
@@ -42,18 +42,9 @@ describe('Billing Facade Mock', function () {
       it('returns bad request error', function(done) {
         request(server)
           .post('/price_for_module')
-          .send({module: '1234', cost_code: 'S4567r', product: 'Product'})
+          .send({module: '1234', cost_code: 'S4567r'})
           .expect(400, done)
       })      
     })
-    context('when product name is invalid', function() {
-      it('returns bad request error', function(done) {
-        request(server)
-          .post('/price_for_module')
-          .send({module: '1234', cost_code: 'S4567', product: 'xProduct'})
-          .expect(400, done)
-      })      
-    })    
-
   })
 });

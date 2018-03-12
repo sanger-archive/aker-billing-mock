@@ -148,21 +148,17 @@ const get_price_for_module = () => {
   return (req, res) => {
     const module = req.body['module']
     const cost_code = req.body['cost_code']
-    const product = req.body['product']
 
     let errors = []
     if (!verifyModuleName(module)) {
       errors.push('Module name not valid')
-    }
-    if (!verifyProductName(product)) {
-      errors.push('Product name not valid') 
     }
     if (!((verifySubAccountCode(cost_code) || verifyAccountCode(cost_code)))) {
       errors.push('Project not valid') 
     }
 
     if (errors.length === 0) {
-      res.status(200).json({ product, module, cost_code, price: determineModulePrice(module, cost_code) })
+      res.status(200).json({ module, cost_code, price: determineModulePrice(module, cost_code) })
     } else {
       res.status(400).json({ errors })
     }
