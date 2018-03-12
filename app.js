@@ -154,7 +154,7 @@ const get_price_for_module = () => {
       errors.push('Module name not valid')
     }
     if (!((verifySubAccountCode(cost_code) || verifyAccountCode(cost_code)))) {
-      errors.push('Project not valid') 
+      errors.push('Project cost code not valid') 
     }
 
     if (errors.length === 0) {
