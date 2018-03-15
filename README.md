@@ -20,6 +20,12 @@ To start a HTTPS server, we need to provide the paths to the private key and cer
 
 `node app.js -k <keyfile> -c <certificate> -h <host> -p <port>`
 
+## Testing
+
+To run the tests with Mocha:
+
+`npm test`
+
 ## Misc.
 ### Node packages used
 * [nodemon](https://github.com/remy/nodemon/) - `npm install --global nodemon`
