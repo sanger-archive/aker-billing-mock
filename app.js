@@ -29,6 +29,31 @@ function determineUnitPrice(product, accountCode) {
   return (product.length + accountCode.length).toString()
 }
 
+function determineModulePrice(module, accountCode) {
+  return (module.length + accountCode.length).toString()
+}
+
+
+/**
+ * Verifies a process module - currently only IDs starting with an even number are valid
+ * @param {int} moduleId - The module ID to verify
+ * @return {boolean} - Whether the module id is verified or not
+ */
+function verifyModuleId(moduleId) {
+  const moduleIdPattern = /^[02468]{1}\d*$/
+  return (moduleIdPattern.test(moduleId.trim()))
+}
+
+/**
+ * Verifies a process module - currently only names starting with 'x' are invalid
+ * @param {string} moduleName - The module name to verify
+ * @return {boolean} - Whether the module name is verified or not
+ */
+function verifyModuleName(moduleName) {
+  const moduleNamePattern = /^(?!x).*$/
+  return (moduleNamePattern.test(moduleName.trim()))
+}
+
 /**
  * Verifies a product name
  * @param {string} productName - The product name to verify
@@ -119,11 +144,38 @@ const actionHandlerMultipleVerify = (field, singleVerify) => {
   }
 }
 
+const get_price_for_module = () => {
+  return (req, res) => {
+    const module = req.body['module']
+    const cost_code = req.body['cost_code']
 
-// Verify product name
+    let errors = []
+    if (!verifyModuleName(module)) {
+      errors.push('Module name not valid')
+    }
+    if (!((verifySubAccountCode(cost_code) || verifyAccountCode(cost_code)))) {
+      errors.push('Project cost code not valid') 
+    }
+
+    if (errors.length === 0) {
+      res.status(200).json({ module, cost_code, price: determineModulePrice(module, cost_code) })
+    } else {
+      res.status(400).json({ errors })
+    }
+  }
+}
+
+
+// Verify module ID
 app.get(
-  '/products/:product/verify',
-  actionHandlerSingleVerify('product', 'productName', verifyProductName)
+  '/modules/:module/verifyId',
+  actionHandlerSingleVerify('module', 'moduleId', verifyModuleId)
+)
+
+// Verify module name
+app.get(
+  '/modules/:module/verifyName',
+  actionHandlerSingleVerify('module', 'moduleName', verifyModuleName)
 )
 
 // Verify account code
@@ -138,11 +190,20 @@ app.get(
   actionHandlerSingleVerify('subAccountCode', 'subAccountCode', verifySubAccountCode)
 )
 
-// Verify the catalog of products
-app.post('/catalogue/verify', actionHandlerMultipleVerify('products', verifyProductName))
+// Verify product name
+app.get(
+  '/products/:product/verify',
+  actionHandlerSingleVerify('product', 'productName', verifyProductName)
+)
+
+// Verify a list of modules
+app.post('/modules/verify', actionHandlerMultipleVerify('modules', verifyModuleId))
 
 // Verify a list of cost codes
 app.post('/accounts/verify', actionHandlerMultipleVerify('accounts', verifyAccountCode))
+
+// Returns a price for a product and module with a cost code
+app.post('/price_for_module', get_price_for_module())
 
 // Receive events
 app.post('/events', (req, res) => {
@@ -178,3 +239,5 @@ if (SSL) {
 server.listen(PORT, HOST)
 
 console.log(`Running on ${SSL ? 'https' : 'http'}://${HOST}:${PORT}`)
+
+module.exports = server;
