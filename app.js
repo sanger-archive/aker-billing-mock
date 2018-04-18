@@ -218,7 +218,9 @@ app.post('/events', (req, res) => {
 // Get a list of sub- cost codes (account codes) for a cost code (account code)
 app.get('/accounts/:accountCode/subaccountcodes', (req, res) => {
   const { accountCode } = req.params
-  const numOfSubs = Math.ceil(Math.random() * 10)
+  // First integer in the costcode used to generate a deterministic amount of
+  // sub-cost-codes. e.g S7492 will have 7 sub-cost-codes.
+  const numOfSubs = accountCode[1]
   const subCostCodes = []
   for (let i = 0; i < numOfSubs; i += 1) {
     subCostCodes.push(`${accountCode}-${i}`)
