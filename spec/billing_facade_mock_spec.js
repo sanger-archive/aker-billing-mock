@@ -21,14 +21,14 @@ describe('Billing Facade Mock', function () {
 
   context('when obtaining the price for a module and cost code', function() {
     context('when module and cost code are right', function() {
-      it('returns a price for the module', function(done) {
+      it('returns a price of zero for the module', function(done) {
         request(server)
           .post('/price_for_module')
           .send({module: '1234', cost_code: 'S4567'})
           .expect(200, {
-            module: '1234', cost_code: 'S4567', price: '9'
+            module: '1234', cost_code: 'S4567', price: '0'
           }, done)
-      })            
+      })
     })
     context('when module is invalid', function() {
       it('returns bad request error', function(done) {
@@ -36,7 +36,7 @@ describe('Billing Facade Mock', function () {
           .post('/price_for_module')
           .send({module: 'x1234', cost_code: 'S4567'})
           .expect(400, done)
-      })      
+      })
     })
     context('when cost code is invalid', function() {
       it('returns bad request error', function(done) {
@@ -44,7 +44,7 @@ describe('Billing Facade Mock', function () {
           .post('/price_for_module')
           .send({module: '1234', cost_code: 'S4567r'})
           .expect(400, done)
-      })      
+      })
     })
   })
 });
