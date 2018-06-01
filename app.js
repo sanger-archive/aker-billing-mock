@@ -26,11 +26,11 @@ const app = express()
  * @return {string} - The unit price
  */
 function determineUnitPrice(product, accountCode) {
-  return (product.length + accountCode.length).toString()
+  return (0).toString()
 }
 
 function determineModulePrice(module, accountCode) {
-  return (module.length + accountCode.length).toString()
+  return (0).toString()
 }
 
 
@@ -154,7 +154,7 @@ const get_price_for_module = () => {
       errors.push('Module name not valid')
     }
     if (!((verifySubAccountCode(cost_code) || verifyAccountCode(cost_code)))) {
-      errors.push('Project cost code not valid') 
+      errors.push('Project cost code not valid')
     }
 
     if (errors.length === 0) {
