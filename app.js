@@ -35,32 +35,30 @@ function determineModulePrice(module, accountCode) {
 
 
 /**
- * Verifies a process module - currently only IDs starting with an even number are valid
+ * Verifies a process module - everything is valid (for now)
  * @param {int} moduleId - The module ID to verify
  * @return {boolean} - Whether the module id is verified or not
  */
 function verifyModuleId(moduleId) {
-  const moduleIdPattern = /^[02468]{1}\d*$/
-  return (moduleIdPattern.test(moduleId.trim()))
+  return true;
 }
 
 /**
- * Verifies a process module - currently only names starting with 'x' are invalid
+ * Verifies a process module - everything is valid (for now)
  * @param {string} moduleName - The module name to verify
  * @return {boolean} - Whether the module name is verified or not
  */
 function verifyModuleName(moduleName) {
-  const moduleNamePattern = /^(?!x).*$/
-  return (moduleNamePattern.test(moduleName.trim()))
+  return true;
 }
 
 /**
- * Verifies a product name
+ * Verifies a product name - everything is valid (for now)
  * @param {string} productName - The product name to verify
  * @return {boolean} - Whether the product name is verified or not
  */
 function verifyProductName(productName) {
-  return !productName.toLowerCase().startsWith('x')
+  return true;
 }
 
 /**
@@ -69,7 +67,7 @@ function verifyProductName(productName) {
  * @return {boolean} - Whether the account code is verified or not
  */
 function verifyAccountCode(accountCode) {
-  const accountCodePattern = /^s\d{4}$/i
+  const accountCodePattern = /^[s,g]\d{4}$/i
   return (accountCodePattern.test(accountCode.trim()))
 }
 
@@ -79,7 +77,7 @@ function verifyAccountCode(accountCode) {
  * @return {boolean} - Whether the account code is verified or not
  */
 function verifySubAccountCode(subAccountCode) {
-  const subAccountCodePattern = /^s\d{4}-(\d)?[02468]$/i
+  const subAccountCodePattern = /^[s,g]\d{4}-\d{1}$/i
   return (subAccountCodePattern.test(subAccountCode.trim()))
 }
 
@@ -215,16 +213,10 @@ app.post('/events', (req, res) => {
   res.status(200).end()
 })
 
-// Get a list of sub- cost codes (account codes) for a cost code (account code)
+// Get a single of sub- cost code (account code) for a cost code (account code)
 app.get('/accounts/:accountCode/subaccountcodes', (req, res) => {
   const { accountCode } = req.params
-  // First integer in the costcode used to generate a deterministic amount of
-  // sub-cost-codes. e.g S7492 will have 7 sub-cost-codes.
-  const numOfSubs = accountCode[1]
-  const subCostCodes = []
-  for (let i = 0; i < numOfSubs; i += 1) {
-    subCostCodes.push(`${accountCode}-${i}`)
-  }
+  const subCostCodes = [`${accountCode}-0`];
   res.status(200).json({ subCostCodes })
 })
 
