@@ -30,12 +30,14 @@ describe('Billing Facade Mock', function () {
           }, done)
       })
     })
-    context('when module is invalid', function() {
-      it('returns bad request error', function(done) {
+    context('module is never invalid', function() {
+      it('returns a price of zero for the module', function(done) {
         request(server)
           .post('/price_for_module')
           .send({module: 'x1234', cost_code: 'S4567'})
-          .expect(400, done)
+          .expect(200, {
+            module: 'x1234', cost_code: 'S4567', price: '0'
+          }, done)
       })
     })
     context('when cost code is invalid', function() {
