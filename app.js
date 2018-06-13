@@ -67,7 +67,7 @@ function verifyProductName(productName) {
  * @return {boolean} - Whether the account code is verified or not
  */
 function verifyAccountCode(accountCode) {
-  const accountCodePattern = /^[s,g]\d{4}$/i
+  const accountCodePattern = /^[s,g,t,n]\d{4}$/i
   return (accountCodePattern.test(accountCode.trim()))
 }
 
@@ -77,7 +77,7 @@ function verifyAccountCode(accountCode) {
  * @return {boolean} - Whether the account code is verified or not
  */
 function verifySubAccountCode(subAccountCode) {
-  const subAccountCodePattern = /^[s,g]\d{4}-\d{1}$/i
+  const subAccountCodePattern = /^[s,g,t,n]\d{4}-\d{1}$/i
   return (subAccountCodePattern.test(subAccountCode.trim()))
 }
 
